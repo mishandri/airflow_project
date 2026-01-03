@@ -69,11 +69,11 @@ with DAG(
         )
 
     @task
-    def load_data(agg: dict):
+    def load_data(agg: dict, **context):
+        ds = context["ds"]  # БЕРЁМ ИЗ КОНТЕКСТА
         sql = Template(agg["table_dml"]).render(
             table_name=agg["table_name"],
-            ds="{{ ds }}",
-            next_ds="{{ next_ds }}",
+            ds=ds  # ← передаём как переменную
         )
         PostgresHook("conn_pg").run(sql)
 
@@ -91,16 +91,15 @@ with DAG(
             postgres_conn_id="conn_pg",
             s3_conn_id="conn_s3"
         )
-        op.execute(context={})
 
-    # === РАЗВОРАЧИВАНИЕ ===
+    # РАЗВОРАЧИВАНИЕ
     ensure_tasks = ensure_table.expand(agg=load_config.output)
     wait_tasks = wait_empty_partition.expand(agg=load_config.output)
     load_tasks = load_data.expand(agg=load_config.output)
     export_tasks = export_if_needed.expand(agg=load_config.output)
 
-    # === ЗАВИСИМОСТИ ===
+    # ЗАВИСИМОСТИ
     ensure_tasks >> wait_tasks >> load_tasks >> export_tasks
 
-    # === КРАСИВАЯ РАМКА ===
-    dag_start >> load_config >> ensure_tasks >> dag_end
+    # ИДЕАЛЬНЫЙ ГРАФ — ОДНА СТРОЧКА
+    dag_start >> load_config >> ensure_tasks >> [load_tasks, export_tasks] >> dag_end
