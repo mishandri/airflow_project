@@ -1,4 +1,3 @@
-# dags/sensors/sensor_postgres_check_empty_partition_mikhail_k.py
 from airflow.sensors.base import BaseSensorOperator
 from airflow.utils.decorators import apply_defaults
 from airflow.providers.postgres.hooks.postgres import PostgresHook

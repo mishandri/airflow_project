@@ -1,4 +1,3 @@
-# dags/operators/operator_s3_load_config_mikhail_k.py
 from airflow.models import BaseOperator
 from airflow.utils.decorators import apply_defaults
 import boto3

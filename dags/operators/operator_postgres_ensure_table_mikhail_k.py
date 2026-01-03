@@ -1,4 +1,3 @@
-# dags/operators/operator_postgres_ensure_table_mikhail_k.py
 from airflow.models import BaseOperator
 from airflow.utils.decorators import apply_defaults
 from airflow.providers.postgres.hooks.postgres import PostgresHook
