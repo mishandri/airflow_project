@@ -67,7 +67,6 @@ with DAG(
             timeout=600,
             mode="reschedule"
         )
-        sensor.execute(context={})
 
     @task
     def load_data(agg: dict):
