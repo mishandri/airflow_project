@@ -73,17 +73,20 @@ with DAG(
         ds = context["ds"]  # БЕРЁМ ИЗ КОНТЕКСТА
         sql = Template(agg["table_dml"]).render(
             table_name=agg["table_name"],
-            ds=ds  # ← передаём как переменную
+            ds=ds  # передаём как переменную
         )
         PostgresHook("conn_pg").run(sql)
 
     @task
-    def export_if_needed(agg: dict):
+    def export_if_needed(agg: dict, **context):
         if not agg.get("need_to_export"):
-            return  # просто ничего не делаем
+            return
+        
         export_path = Template(agg["export_path"]).render(
-            table_name=agg["table_name"].replace(".", "/")
+            table_name=agg["table_name"].replace(".", "/"),
+            ds=context["ds"]
         )
+        
         op = S3ExportCSVOperator(
             task_id=f"export_{agg['table_name'].replace('.', '_')}",
             table_name=agg["table_name"],
@@ -91,6 +94,7 @@ with DAG(
             postgres_conn_id="conn_pg",
             s3_conn_id="conn_s3"
         )
+        op.execute(context=context)
 
     # РАЗВОРАЧИВАНИЕ
     ensure_tasks = ensure_table.expand(agg=load_config.output)
