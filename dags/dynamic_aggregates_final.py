@@ -2,6 +2,7 @@
 from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.decorators import task_group
+from airflow.operators.empty import EmptyOperator
 from operators.operator_s3_load_config_mikhail_k import S3LoadConfigOperator
 from operators.operator_postgres_ensure_table_mikhail_k import PostgresEnsureTableOperator
 from sensors.sensor_postgres_check_empty_partition_mikhail_k import PostgresCheckEmptyPartitionSensor
@@ -10,7 +11,7 @@ from jinja2 import Template
 
 with DAG(
     dag_id="dynamic_aggregates_final",
-    description="Финальная версия — полная динамика + сенсоры + защита от дублей",
+    description="Финальная версия - полная динамика + сенсоры + защита от дублей",
     schedule_interval="0 5 * * *",
     start_date=datetime(2024, 1, 1),
     catchup=False,
@@ -23,6 +24,10 @@ with DAG(
     tags=["aggregates", "dynamic", "mikhail_k"],
     render_template_as_native_obj=True,
 ) as dag:
+    
+    dag_start = EmptyOperator(task_id='dag_start')
+
+    dag_end = EmptyOperator(task_id='dag_end')
 
     load_config = S3LoadConfigOperator(
         task_id="load_config_from_s3",
@@ -71,8 +76,8 @@ with DAG(
                     postgres_conn_id="conn_pg",
                     s3_conn_id="conn_s3"
                 )
-                ensure >> wait_empty >> load >> export
+                dag_start >> ensure >> wait_empty >> load >> export >> dag_end
             else:
-                ensure >> wait_empty >> load
+                dag_start >> ensure >> wait_empty >> load >> dag_end
 
     process_aggregates(load_config.output)
