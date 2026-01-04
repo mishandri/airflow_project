@@ -3,9 +3,9 @@ from airflow import DAG
 from airflow.decorators import task
 from airflow.operators.empty import EmptyOperator
 from airflow.sensors.python import PythonSensor
-from operators.operator_s3_load_config_mikhail_k import S3LoadConfigOperator
-from operators.operator_postgres_ensure_table_mikhail_k import PostgresEnsureTableOperator
-from operators.operator_s3_export_csv_mikhail_k import S3ExportCSVOperator
+from operators.operator_s3_load_config import S3LoadConfigOperator
+from operators.operator_postgres_ensure_table import PostgresEnsureTableOperator
+from operators.operator_s3_export_csv import S3ExportCSVOperator
 from airflow.providers.postgres.hooks.postgres import PostgresHook
 from jinja2 import Template
 
