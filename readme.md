@@ -38,10 +38,10 @@ dags/
 ├── dynamic_aggregates_final.py                            # сам даг
 │
 ├── operators/
-│   ├── operator_postgres_ensure_table_mikhail_k.py        # оператор проверки таблицы
-│   ├── operator_s3_load_config_mikhail_k.py               # оператор загрузки конфига
-│   └── operator_s3_export_csv_mikhail_k.py                # оператор экспорта в csv
+│   ├── operator_postgres_ensure_table.py        # оператор проверки таблицы
+│   ├── operator_s3_load_config.py               # оператор загрузки конфига
+│   └── operator_s3_export_csv.py                # оператор экспорта в csv
 │
 └── sensors/
-    └── sensor_postgres_check_empty_partition_mikhail_k.py # сенсор проверки данных в таблице в БД
+    └── sensor_postgres_check_empty_partition.py # сенсор проверки данных в таблице в БД
 ```
